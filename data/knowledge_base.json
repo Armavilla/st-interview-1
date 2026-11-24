@@ -1,0 +1,4 @@
+[
+  {"doc_id": "OPS-17", "title": "checkout-api degradation", "body": "For checkout-api, propose a P2 incident after 10 consecutive minutes of degraded status. Include the observed duration."},
+  {"doc_id": "OPS-22", "title": "catalog-api health check", "body": "When catalog-api reports healthy, return the observed status. No incident is needed."}
+]

@@ -1,0 +1,4 @@
+[
+  {"service_name": "catalog-api", "status": "healthy", "duration_minutes": 60},
+  {"service_name": "checkout-api", "status": "degraded", "duration_minutes": 15}
+]

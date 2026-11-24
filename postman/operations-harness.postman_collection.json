@@ -1,0 +1,390 @@
+{
+  "info": {
+    "name": "Operations Agent Harness",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Healthy service",
+      "item": [
+        {
+          "name": "Check catalog-api",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/runs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"objective\": \"Check catalog-api\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Check catalog-api\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const run = pm.response.json();",
+                  "  pm.collectionVariables.set('run_id', run.run_id);",
+                  "  pm.expect(run.result).to.include('healthy');",
+                  "  pm.expect(run.incident_ids).to.have.lengthOf(0);",
+                  "  pm.expect(run.status).to.equal('completed');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Inspect execution history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/runs/{{run_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs",
+                "{{run_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Inspect execution history\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const run = pm.response.json();",
+                  "  pm.expect(run.events.length).to.be.greaterThan(0);",
+                  "  pm.expect(run.run_id).to.equal(pm.collectionVariables.get('run_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Approve an incident",
+      "item": [
+        {
+          "name": "Investigate checkout-api",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/runs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"objective\": \"Investigate checkout-api and propose an incident if the runbook threshold is met.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Investigate checkout-api\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const run = pm.response.json();",
+                  "  pm.collectionVariables.set('run_id', run.run_id);",
+                  "  pm.expect(run.status).to.equal('waiting_approval');",
+                  "  pm.expect(run.incident_ids).to.have.lengthOf(0);",
+                  "  pm.collectionVariables.set('action_id', run.pending_action.action_id);",
+                  "  pm.expect(run.pending_action.arguments.severity).to.equal('P2');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Inspect execution history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/runs/{{run_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs",
+                "{{run_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Inspect execution history\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const run = pm.response.json();",
+                  "  pm.expect(run.events.length).to.be.greaterThan(0);",
+                  "  pm.expect(run.run_id).to.equal(pm.collectionVariables.get('run_id'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/runs/{{run_id}}/approvals/{{action_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs",
+                "{{run_id}}",
+                "approvals",
+                "{{action_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"approve\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Approve\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const run = pm.response.json();",
+                  "  pm.expect(run.status).to.equal('completed');",
+                  "  pm.expect(run.incident_ids).to.have.lengthOf(1);",
+                  "  pm.collectionVariables.set('incident_id', run.incident_ids[0]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Repeat approval",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/runs/{{run_id}}/approvals/{{action_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs",
+                "{{run_id}}",
+                "approvals",
+                "{{action_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"approve\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Repeat approval\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const run = pm.response.json();",
+                  "  pm.expect(run.status).to.equal('completed');",
+                  "  pm.expect(run.incident_ids).to.deep.equal([pm.collectionVariables.get('incident_id')]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reject an incident",
+      "item": [
+        {
+          "name": "Start a fresh investigation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/runs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"objective\": \"Investigate checkout-api and propose an incident if the runbook threshold is met.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Start a fresh investigation\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const run = pm.response.json();",
+                  "  pm.collectionVariables.set('run_id', run.run_id);",
+                  "  pm.expect(run.status).to.equal('waiting_approval');",
+                  "  pm.expect(run.incident_ids).to.have.lengthOf(0);",
+                  "  pm.collectionVariables.set('action_id', run.pending_action.action_id);",
+                  "  pm.expect(run.pending_action.arguments.severity).to.equal('P2');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/runs/{{run_id}}/approvals/{{action_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "runs",
+                "{{run_id}}",
+                "approvals",
+                "{{action_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"reject\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Reject\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const run = pm.response.json();",
+                  "  pm.expect(run.status).to.equal('completed');",
+                  "  pm.expect(run.stop_reason).to.equal('approval_rejected');",
+                  "  pm.expect(run.incident_ids).to.have.lengthOf(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

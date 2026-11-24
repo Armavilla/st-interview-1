@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>运维助手 · 值班台</title>
+    <link rel="stylesheet" href="/assets/chat.css" />
+    <script src="/assets/chat.js" defer></script>
+  </head>
+  <body>
+    <div class="shell">
+      <aside id="sidebar" aria-label="对话导航">
+        <div class="brand">
+          <span class="signal" aria-hidden="true"
+            ><i></i><i></i><i></i><i></i></span
+          >值班台<button id="closeNav" class="mobile" aria-label="关闭导航">
+            ×
+          </button>
+        </div>
+        <button id="newChat" class="new">
+          <span aria-hidden="true">＋</span> 新对话
+        </button>
+        <h2>最近对话</h2>
+        <nav id="recent" aria-label="最近对话"></nav>
+        <div class="rail-foot"><span class="dot"></span> 本地工作区</div>
+      </aside>
+      <button id="shade" aria-label="关闭侧栏" hidden></button>
+      <main>
+        <header>
+          <div class="location">
+            <button
+              id="openNav"
+              class="mobile"
+              aria-label="打开最近对话"
+              aria-expanded="false"
+            >
+              ☰</button
+            ><span class="dot"></span>
+            <h1>运维助手</h1>
+          </div>
+          <div class="meta">
+            <span id="backend">连接中</span
+            ><span class="dataset">模拟数据</span>
+          </div>
+        </header>
+        <div id="viewport">
+          <div class="column">
+            <section id="welcome">
+              <span class="signal large" aria-hidden="true"
+                ><i></i><i></i><i></i><i></i
+              ></span>
+              <h2>想排查哪个服务？</h2>
+              <p>查询服务状态、查阅运维手册，或提交工单审批。</p>
+              <div class="suggestions">
+                <button data-prompt="检查 catalog-api 的服务状态。">
+                  <span>服务状态</span><strong>检查 catalog-api</strong
+                  ><b aria-hidden="true">↗</b>
+                </button>
+                <button
+                  data-prompt="检查 checkout-api，符合手册条件时申请建单。"
+                >
+                  <span>故障排查</span><strong>排查 checkout-api</strong
+                  ><b aria-hidden="true">↗</b>
+                </button>
+              </div>
+            </section>
+            <section id="turns" aria-label="对话消息"></section>
+          </div>
+        </div>
+        <footer>
+          <div class="column">
+            <div id="status" role="status"></div>
+            <form>
+              <textarea
+                id="message"
+                rows="2"
+                maxlength="8192"
+                aria-label="消息"
+                placeholder="输入问题或继续追问…"
+                required
+              ></textarea>
+              <div class="form-tools">
+                <span>Enter 发送 <b>·</b> Shift + Enter 换行</span
+                ><button id="send" class="primary" aria-label="发送" disabled>
+                  发送 <span aria-hidden="true">↑</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>
